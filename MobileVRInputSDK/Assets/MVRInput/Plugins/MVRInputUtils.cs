@@ -15,4 +15,9 @@
         FAILEDTOSEND
     }
 
+    public enum MVRInputMsgType
+    {
+        BUTTON
+    }
+
 }

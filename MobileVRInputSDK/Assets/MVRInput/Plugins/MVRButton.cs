@@ -1,5 +1,8 @@
 ﻿namespace MVRInput
 {
+    using System;
+
+    [Serializable]
     public class MVRButton
     {
         public float nR = 0f;
@@ -25,6 +28,7 @@
         public float x = 0f;
         public float y = 0f;
         public float z = 0f;
+
         public float w = 0f;
         public float h = 0f;
 
@@ -32,11 +36,14 @@
         public float sy = 0f;
         public float sz = 0f;
 
+        public float cm = 0f;
+        
         public int id = -1;
 
         public string text = "Button";
     }
 
+    [Serializable]
     public class MVRButtonData
     {
         public int id = -1;
