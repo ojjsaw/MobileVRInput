@@ -26,7 +26,7 @@ public class MVRController : MonoBehaviour {
         if(ReceiveMsgEmulator(out recbuffer))
         {
             System.Object tmp = ByteArrayToObject(recbuffer);
-            if (tmp.GetType() == typeof(MVRButton)) LoadButtonInfo(tmp);
+            if (tmp.GetType() == typeof(MVRButtonInfo)) LoadButtonInfo(tmp);
             
             if (tmp.GetType() == typeof(MVRButtonData))
             {
@@ -50,7 +50,7 @@ public class MVRController : MonoBehaviour {
 
     private void LoadButtonInfo(System.Object obj)
     {
-        MVRButton mvrButton = obj as MVRButton;
+        MVRButtonInfo mvrButton = obj as MVRButtonInfo;
         GameObject child = Instantiate(ButtonPrefab, Vector3.zero, Quaternion.identity);
         child.transform.parent = this.transform;
 

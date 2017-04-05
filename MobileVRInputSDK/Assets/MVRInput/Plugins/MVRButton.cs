@@ -1,9 +1,11 @@
 ﻿namespace MVRInput
 {
     using System;
+    using UnityEngine;
+    using UnityEngine.UI;
 
     [Serializable]
-    public class MVRButton
+    public class MVRButtonInfo
     {
         public float nR = 0f;
         public float nG = 0f;
@@ -48,5 +50,108 @@
     {
         public int id = -1;
         public int pressed = 0; //0 = false, 1 = true
+    }
+
+    public class MVRButton
+    {
+        private int id = -1;
+        private MVRButtonData data = new MVRButtonData();
+        private MVRInputManager instance = null;
+        private Transform child = null;
+        private GameObject ButtonPrefab;
+        private Transform thisObj;
+        public MVRButton(int id, MVRInputManager instance, Transform child, GameObject ButtonPrefab, Transform thisObj)
+        {
+            this.id = id;
+            this.instance = instance;
+            data = new MVRButtonData();
+            data.id = this.id;
+            data.pressed = 1;
+            this.child = child;
+            this.ButtonPrefab = ButtonPrefab;
+            this.thisObj = thisObj;
+            instance.SendMsgEmulator(instance.ObjectToByteArray(SaveButtonInfo(child, id)));
+            child.GetComponent<Button>().onClick.AddListener(OnButtonSendClick);
+        }
+
+        public void OnButtonSendClick()
+        {
+            instance.SendMsgEmulator(instance.ObjectToByteArray(data));
+        }
+
+        public void OnButtonReceiveClick()
+        {
+            instance.SendMsgEmulator(instance.ObjectToByteArray(data));
+        }
+
+        private MVRButtonInfo SaveButtonInfo(Transform child, int id)
+        {
+            MVRButtonInfo mvrButton = new MVRButtonInfo();
+
+            Image img = child.GetComponent<Image>();
+            mvrButton.bR = img.color.r;
+            mvrButton.bG = img.color.g;
+            mvrButton.bB = img.color.b;
+            mvrButton.bA = img.color.a;
+
+            Button bttn = child.GetComponent<Button>();
+            ColorBlock cb = bttn.colors;
+            mvrButton.nR = cb.normalColor.r;
+            mvrButton.nG = cb.normalColor.g;
+            mvrButton.nB = cb.normalColor.b;
+            mvrButton.nA = cb.normalColor.a;
+
+            mvrButton.pR = cb.pressedColor.r;
+            mvrButton.pG = cb.pressedColor.g;
+            mvrButton.pB = cb.pressedColor.b;
+            mvrButton.pA = cb.pressedColor.a;
+
+            mvrButton.dR = cb.disabledColor.r;
+            mvrButton.dG = cb.disabledColor.g;
+            mvrButton.dB = cb.disabledColor.b;
+            mvrButton.dA = cb.disabledColor.a;
+
+            mvrButton.cm = cb.colorMultiplier;
+
+            RectTransform rt = child.GetComponent<RectTransform>();
+            mvrButton.x = rt.localPosition.x;
+            mvrButton.y = rt.localPosition.y;
+            mvrButton.z = rt.localPosition.z;
+
+            mvrButton.sx = rt.localScale.x;
+            mvrButton.sy = rt.localScale.y;
+            mvrButton.sz = rt.localScale.z;
+
+            mvrButton.w = rt.sizeDelta.x;
+            mvrButton.h = rt.sizeDelta.y;
+
+            mvrButton.text = child.GetComponentInChildren<Text>().text;
+            mvrButton.id = id;
+
+            return mvrButton;
+        }
+
+        private void LoadButtonInfo(System.Object obj)
+        {
+            MVRButtonInfo mvrButton = obj as MVRButtonInfo;
+            GameObject child = GameObject.Instantiate(ButtonPrefab, Vector3.zero, Quaternion.identity);
+            child.transform.parent = thisObj.transform;
+
+            child.GetComponent<Image>().color = new Color(mvrButton.bR, mvrButton.bG, mvrButton.bB, mvrButton.bA);
+
+            ColorBlock cb = new ColorBlock();
+            cb.normalColor = new Color(mvrButton.nR, mvrButton.nG, mvrButton.nB, mvrButton.nA);
+            cb.pressedColor = new Color(mvrButton.pR, mvrButton.pG, mvrButton.pB, mvrButton.pA);
+            cb.disabledColor = new Color(mvrButton.dR, mvrButton.dG, mvrButton.dB, mvrButton.dA);
+            cb.colorMultiplier = mvrButton.cm;
+            child.GetComponent<Button>().colors = cb;
+
+            child.GetComponent<RectTransform>().localPosition = new Vector3(mvrButton.x, mvrButton.y, mvrButton.z);
+            child.GetComponent<RectTransform>().localScale = new Vector3(mvrButton.sx, mvrButton.sy, mvrButton.sz);
+            child.GetComponent<RectTransform>().sizeDelta = new Vector2(mvrButton.w, mvrButton.h);
+
+            child.GetComponentInChildren<Text>().text = mvrButton.text;
+            child.name = mvrButton.id.ToString();
+        }
     }
 }
