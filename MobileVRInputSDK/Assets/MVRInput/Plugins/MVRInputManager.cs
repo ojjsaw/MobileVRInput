@@ -23,7 +23,7 @@ public class MVRInputManager : MonoBehaviour
 
             if (child.GetComponent<Button>() != null)
             {
-                MVRButton buttonEvent = new MVRButton(i, this.GetComponent<MVRInputManager>(), child, buttonPrefab, this.transform);              
+                MVRButton buttonEvent = new MVRButton(i, false, this.transform, child);              
             }
 
 

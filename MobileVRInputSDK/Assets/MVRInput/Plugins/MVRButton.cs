@@ -56,32 +56,40 @@
     {
         private int id = -1;
         private MVRButtonData data = new MVRButtonData();
-        private MVRInputManager instance = null;
+        private MVRInputManager mInstance = null;
+        private MVRController cInstance = null;
         private Transform child = null;
         private GameObject ButtonPrefab;
         private Transform thisObj;
-        public MVRButton(int id, MVRInputManager instance, Transform child, GameObject ButtonPrefab, Transform thisObj)
+        private bool isGamePad = false;
+
+        public MVRButton(int id, bool isGamePad, Transform thisObj, Transform child = null, System.Object tmp = null)
         {
             this.id = id;
-            this.instance = instance;
+            this.isGamePad = isGamePad;
+            if (isGamePad) cInstance = thisObj.GetComponent<MVRController>();
+            else mInstance = thisObj.GetComponent<MVRInputManager>();
             data = new MVRButtonData();
             data.id = this.id;
             data.pressed = 1;
-            this.child = child;
-            this.ButtonPrefab = ButtonPrefab;
+            this.ButtonPrefab = Resources.Load("ButtonPrefab") as GameObject;
             this.thisObj = thisObj;
-            instance.SendMsgEmulator(instance.ObjectToByteArray(SaveButtonInfo(child, id)));
-            child.GetComponent<Button>().onClick.AddListener(OnButtonSendClick);
+
+            if (!isGamePad) this.child = child;
+            if (isGamePad) LoadButtonInfo(tmp);
+
+            if (!isGamePad)  mInstance.SendMsgEmulator(mInstance.ObjectToByteArray(SaveButtonInfo(child, id)));
+            if (!isGamePad) child.GetComponent<Button>().onClick.AddListener(OnButtonSendClick);
         }
 
         public void OnButtonSendClick()
         {
-            instance.SendMsgEmulator(instance.ObjectToByteArray(data));
+            mInstance.SendMsgEmulator(mInstance.ObjectToByteArray(data));
         }
 
         public void OnButtonReceiveClick()
         {
-            instance.SendMsgEmulator(instance.ObjectToByteArray(data));
+            mInstance.SendMsgEmulator(mInstance.ObjectToByteArray(data));
         }
 
         private MVRButtonInfo SaveButtonInfo(Transform child, int id)

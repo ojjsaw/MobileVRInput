@@ -26,7 +26,13 @@ public class MVRController : MonoBehaviour {
         if(ReceiveMsgEmulator(out recbuffer))
         {
             System.Object tmp = ByteArrayToObject(recbuffer);
-            if (tmp.GetType() == typeof(MVRButtonInfo)) LoadButtonInfo(tmp);
+            if (tmp.GetType() == typeof(MVRButtonInfo))
+            {
+                MVRButton button = new MVRButton(0, true, this.transform, null, tmp);
+
+            }
+                
+                //LoadButtonInfo(tmp);
             
             if (tmp.GetType() == typeof(MVRButtonData))
             {
