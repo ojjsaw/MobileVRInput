@@ -2,6 +2,7 @@
 {
     using System;
     using UnityEngine;
+    using UnityEngine.EventSystems;
     using UnityEngine.UI;
 
     [Serializable]
@@ -62,6 +63,7 @@
         private GameObject ButtonPrefab;
         private Transform thisObj;
         private bool isGamePad = false;
+        private Button bttn = null;
 
         public MVRButton(int id, bool isGamePad, Transform thisObj, Transform child = null, System.Object tmp = null)
         {
@@ -89,9 +91,18 @@
 
         public void OnButtonReceiveClick()
         {
-            mInstance.SendMsgEmulator(mInstance.ObjectToByteArray(data));
+            var pointer = new PointerEventData(EventSystem.current);
+            ExecuteEvents.Execute(this.bttn.gameObject, pointer, ExecuteEvents.pointerEnterHandler);
+            ExecuteEvents.Execute(this.bttn.gameObject, pointer, ExecuteEvents.pointerDownHandler);
+            ExecuteEvents.Execute(this.bttn.gameObject, pointer, ExecuteEvents.pointerUpHandler);
+
+            //this.bttn.onClick.Invoke();
         }
 
+        public int GetID()
+        {
+            return id;
+        }
         private MVRButtonInfo SaveButtonInfo(Transform child, int id)
         {
             MVRButtonInfo mvrButton = new MVRButtonInfo();
@@ -160,6 +171,9 @@
 
             child.GetComponentInChildren<Text>().text = mvrButton.text;
             child.name = mvrButton.id.ToString();
+            bttn = child.GetComponent<Button>();
+            id = mvrButton.id;
+
         }
     }
 }

@@ -29,14 +29,15 @@ public class MVRController : MonoBehaviour {
             if (tmp.GetType() == typeof(MVRButtonInfo))
             {
                 MVRButton button = new MVRButton(0, true, this.transform, null, tmp);
-
+                UIElements.Add(button.GetID(), button);
             }
                 
                 //LoadButtonInfo(tmp);
             
             if (tmp.GetType() == typeof(MVRButtonData))
             {
-                Debug.Log("MVRButtonData");
+                MVRButtonData data = tmp as MVRButtonData;
+                if (UIElements.Contains(data.id)) (UIElements[data.id] as MVRButton).OnButtonReceiveClick();
 
             }
         }

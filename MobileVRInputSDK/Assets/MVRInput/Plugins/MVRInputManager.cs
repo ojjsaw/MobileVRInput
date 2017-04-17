@@ -26,13 +26,6 @@ public class MVRInputManager : MonoBehaviour
                 MVRButton buttonEvent = new MVRButton(i, false, this.transform, child);              
             }
 
-
-            MVRButtonData data = new MVRButtonData();
-            data.id = 10;
-            data.pressed = 1;
-
-            SendMsgEmulator(ObjectToByteArray(data));
-
         }
 
 
