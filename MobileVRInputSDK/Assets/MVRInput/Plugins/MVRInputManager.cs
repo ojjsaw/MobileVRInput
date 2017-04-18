@@ -1,18 +1,31 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using MVRInput;
 using UnityEngine.UI;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
-using System;
 
 public class MVRInputManager : MonoBehaviour
 {
-
+    public static MVRInputManager instance = null;
     public MVRController emulatorController;
     public GameObject buttonPrefab;
     // Use this for initialization
+
+    private void Awake()
+    {
+        //Check if instance already exists
+        if (instance == null)
+
+            //if not, set instance to this
+            instance = this;
+
+        //If instance already exists and it's not this:
+        else if (instance != this)
+
+            //Then destroy this. This enforces our singleton pattern, meaning there can only ever be one instance of a GameManager.
+            Destroy(gameObject);
+    }
+
     void Start()
     {
 
@@ -23,7 +36,8 @@ public class MVRInputManager : MonoBehaviour
 
             if (child.GetComponent<Button>() != null)
             {
-                MVRButton buttonEvent = new MVRButton(i, false, this.transform, child);              
+                MVRButton mvrButton = child.gameObject.AddComponent<MVRButton>();
+                mvrButton.Initialize(ConnectionType.APP, i);
             }
 
         }

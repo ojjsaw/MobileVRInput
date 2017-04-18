@@ -3,24 +3,37 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using MVRInput;
-using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 public class MVRController : MonoBehaviour {
 
-    public GameObject ButtonPrefab;
+    public static MVRController instance = null;
+    private GameObject ButtonPrefab = null;
     public Queue<byte[]> Msgs = new Queue<byte[]>();
     public Hashtable UIElements = new Hashtable();
 
 	// Use this for initialization
 	void Awake () {
 
-       
-	}
-	
-	// Update is called once per frame
-	void Update () {
+        //Check if instance already exists
+        if (instance == null)
+
+            //if not, set instance to this
+            instance = this;
+
+        //If instance already exists and it's not this:
+        else if (instance != this)
+
+            //Then destroy this. This enforces our singleton pattern, meaning there can only ever be one instance of a GameManager.
+            Destroy(gameObject);
+
+        ButtonPrefab = Resources.Load("ButtonPrefab") as GameObject;
+
+    }
+
+    // Update is called once per frame
+    void Update () {
 
         byte[] recbuffer = new byte[1024];
         if(ReceiveMsgEmulator(out recbuffer))
@@ -28,8 +41,11 @@ public class MVRController : MonoBehaviour {
             System.Object tmp = ByteArrayToObject(recbuffer);
             if (tmp.GetType() == typeof(MVRButtonInfo))
             {
-                MVRButton button = new MVRButton(0, true, this.transform, null, tmp);
-                UIElements.Add(button.GetID(), button);
+                GameObject child = GameObject.Instantiate(ButtonPrefab, Vector3.zero, Quaternion.identity);
+                MVRButton mvrButton = child.AddComponent<MVRButton>();
+                mvrButton.Initialize(ConnectionType.GAMEPAD);
+                mvrButton.OnReceiveEvent(tmp as MVRButtonInfo);
+                UIElements.Add(child.GetComponent<MVRButton>().GetID(), mvrButton);
             }
                 
                 //LoadButtonInfo(tmp);
@@ -37,7 +53,7 @@ public class MVRController : MonoBehaviour {
             if (tmp.GetType() == typeof(MVRButtonData))
             {
                 MVRButtonData data = tmp as MVRButtonData;
-                if (UIElements.Contains(data.id)) (UIElements[data.id] as MVRButton).OnButtonReceiveClick();
+                if (UIElements.Contains(data.id)) (UIElements[data.id] as MVRButton).OnReceiveEvent(tmp as MVRButtonData);
 
             }
         }
