@@ -12,9 +12,11 @@ public class MVRController : MonoBehaviour {
     private GameObject ButtonPrefab = null;
     public Queue<byte[]> Msgs = new Queue<byte[]>();
     public Hashtable UIElements = new Hashtable();
+    public MVRInputConnection connection = null;
+    private MVRInputStatus status = MVRInputStatus.NONE;
 
-	// Use this for initialization
-	void Awake () {
+    // Use this for initialization
+    void Awake () {
 
         //Check if instance already exists
         if (instance == null)
@@ -30,10 +32,13 @@ public class MVRController : MonoBehaviour {
 
         ButtonPrefab = Resources.Load("ButtonPrefab") as GameObject;
 
+        connection = new MVRInputConnection(ConnectionType.GAMEPAD);
+        Debug.Log(connection.ConnectToServer("10.0.0.206"));
+
     }
 
     // Update is called once per frame
-    void Update () {
+    void UpdateEmulator () {
 
         byte[] recbuffer = new byte[1024];
         if(ReceiveMsgEmulator(out recbuffer))
@@ -58,6 +63,35 @@ public class MVRController : MonoBehaviour {
             }
         }
 	}
+
+    void Update()
+    {
+
+        byte[] recbuffer = new byte[1024];
+        status = connection.CheckConnectionStatus(out recbuffer);
+        Debug.Log("CLIENT" + status);
+        if (status == MVRInputStatus.DATARECEIVED)
+        {
+            System.Object tmp = ByteArrayToObject(recbuffer);
+            if (tmp.GetType() == typeof(MVRButtonInfo))
+            {
+                GameObject child = GameObject.Instantiate(ButtonPrefab, Vector3.zero, Quaternion.identity);
+                MVRButton mvrButton = child.AddComponent<MVRButton>();
+                mvrButton.Initialize(ConnectionType.GAMEPAD);
+                mvrButton.OnReceiveEvent(tmp as MVRButtonInfo);
+                UIElements.Add(child.GetComponent<MVRButton>().GetID(), mvrButton);
+            }
+
+            //LoadButtonInfo(tmp);
+
+            if (tmp.GetType() == typeof(MVRButtonData))
+            {
+                MVRButtonData data = tmp as MVRButtonData;
+                if (UIElements.Contains(data.id)) (UIElements[data.id] as MVRButton).OnReceiveEvent(tmp as MVRButtonData);
+
+            }
+        }
+    }
 
     bool ReceiveMsgEmulator(out byte[] buffer)
     {
@@ -110,6 +144,16 @@ public class MVRController : MonoBehaviour {
             memStream.Seek(0, SeekOrigin.Begin);
             var obj = binForm.Deserialize(memStream);
             return obj;
+        }
+    }
+
+    public byte[] ObjectToByteArray(System.Object obj)
+    {
+        BinaryFormatter bf = new BinaryFormatter();
+        using (var ms = new MemoryStream())
+        {
+            bf.Serialize(ms, obj);
+            return ms.ToArray();
         }
     }
 

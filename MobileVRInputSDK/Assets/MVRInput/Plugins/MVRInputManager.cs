@@ -8,6 +8,10 @@ public class MVRInputManager : MonoBehaviour
 {
     public static MVRInputManager instance = null;
     public MVRController emulatorController;
+    public MVRInputConnection connection = null;
+    private MVRInputStatus status = MVRInputStatus.DISCONNECTED;
+    private byte[] buffer = new byte[354];
+
     public GameObject buttonPrefab;
     // Use this for initialization
 
@@ -28,11 +32,16 @@ public class MVRInputManager : MonoBehaviour
 
     void Start()
     {
+        connection = new MVRInputConnection(ConnectionType.APP);
+    }
 
-        int numOfMVRUI = transform.childCount;
+    void InitController()
+    {
+        Transform screen = transform.GetChild(0);
+        int numOfMVRUI = screen.childCount;
         for (int i = 0; i < numOfMVRUI; i++)
         {
-            Transform child = transform.GetChild(i);
+            Transform child = screen.GetChild(i);
 
             if (child.GetComponent<Button>() != null)
             {
@@ -41,23 +50,17 @@ public class MVRInputManager : MonoBehaviour
             }
 
         }
-
-
     }
 
-    
-
-    public byte[] ObjectToByteArray(System.Object obj)
-    {
-        BinaryFormatter bf = new BinaryFormatter();
-        using (var ms = new MemoryStream())
-        {
-            bf.Serialize(ms, obj);
-            return ms.ToArray();
-        }
-    }
 
     public void SendMsgEmulator(byte[] msg)
+    {
+       // Debug.Log(msg.Length);
+        // emulatorController.Msgs.Enqueue(msg);
+        connection.SendToOther(msg);
+    }
+
+    public void SendData(byte[] msg)
     {
         emulatorController.Msgs.Enqueue(msg);
     }
@@ -65,7 +68,9 @@ public class MVRInputManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-
+        status = connection.CheckConnectionStatus(out buffer);
+        if (status == MVRInputStatus.CONNECTED)
+            InitController();
+      //  Debug.Log("Server" + status);
     }
 }

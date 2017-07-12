@@ -14,7 +14,9 @@
         CONNECTED,
         DATARECEIVED,
         DATASENT,
-        FAILEDTOSEND
+        FAILEDTOSEND,
+        FAILEDTOCONNECT,
+        NONE
     }
 
     public enum MVRInputMsgType

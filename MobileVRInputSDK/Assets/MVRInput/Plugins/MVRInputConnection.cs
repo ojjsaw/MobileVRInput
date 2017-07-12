@@ -44,17 +44,33 @@
 
         }
 
-        public MVRInputStatus CheckConnectionStatus()
+        public MVRInputStatus ConnectToServer(string serverAddress)
+        {
+            byte error;
+            otherConnectionId = NetworkTransport.Connect(sockedId, serverAddress, socketPort, 0, out error);
+            if (error != (byte)NetworkError.Ok)
+            {
+                NetworkError nerror = (NetworkError)error;
+                Debug.Log("Error: " + nerror.ToString());
+                return MVRInputStatus.FAILEDTOCONNECT;
+            }
+
+            return MVRInputStatus.CONNECTED;
+        }
+
+        public MVRInputStatus CheckConnectionStatus(out byte[] buffer)
         {
             //TODO: Allocate Buffer
-            byte[] _recbuffer = null;
+            byte[] _recbuffer = new byte[354];
+            buffer = null;
             int _recdataSize;
             byte _recerror;
+            status = MVRInputStatus.NONE;
             NetworkEventType networkEvent = NetworkTransport.Receive(out otherHostId, out otherConnectionId, out otherChannelId, _recbuffer, _recbuffer.Length, out _recdataSize, out _recerror);
             switch (networkEvent)
             {
                 case NetworkEventType.Nothing:
-                    if (isConnected) status = MVRInputStatus.CONNECTED;
+                    if (isConnected) status = MVRInputStatus.NONE;
                     else status = MVRInputStatus.DISCONNECTED;
                     break;
                 case NetworkEventType.ConnectEvent:
@@ -63,23 +79,25 @@
                     break;
                 case NetworkEventType.DataEvent:
                     //TODO: Deserealize Code
+                    buffer = new byte[_recdataSize];
+                    buffer = _recbuffer;
+                    status = MVRInputStatus.DATARECEIVED;
                     break;
                 case NetworkEventType.DisconnectEvent:
                     isConnected = false;
                     status = MVRInputStatus.DISCONNECTED;
                     break;
                 default:
-                    if (isConnected) status = MVRInputStatus.CONNECTED;
+                    if (isConnected) status = MVRInputStatus.NONE;
                     else status = MVRInputStatus.DISCONNECTED;
                     break;
             }
             return status;
         }
 
-        public MVRInputStatus SendToOther(/* TODO: Accept Generic Data*/)
+        public MVRInputStatus SendToOther(byte[] _sendbuffer = null)
         {
             //TODO: Allocate Buffer
-            byte[] _sendbuffer = null;
             byte _senderror;
             if (NetworkTransport.Send(sockedId, otherConnectionId, otherChannelId, _sendbuffer, _sendbuffer.Length, out _senderror))
             {

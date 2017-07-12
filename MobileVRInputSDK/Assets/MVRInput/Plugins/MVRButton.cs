@@ -5,6 +5,8 @@ using UnityEngine.EventSystems;
 using MVRInput;
 using UnityEngine.UI;
 using System;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 public class MVRButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
 {
@@ -27,7 +29,7 @@ public class MVRButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, 
             sender = true;
             m_inputmanager = MVRInputManager.instance;
             id = elementId;
-            m_inputmanager.SendMsgEmulator(m_inputmanager.ObjectToByteArray(SaveButtonInfo(this.transform, id)));
+            m_inputmanager.SendMsgEmulator(ObjectToByteArray(SaveButtonInfo(this.transform, id)));
             m_data = new MVRButtonData();
             m_data.id = id;
         }else
@@ -60,28 +62,30 @@ public class MVRButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, 
     {
         if (!sender) return;
         m_data.pressed = 0;
-        m_inputmanager.SendMsgEmulator(m_inputmanager.ObjectToByteArray(m_data));
+        m_inputmanager.SendMsgEmulator(ObjectToByteArray(m_data));
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
         if (!sender) return;
         m_data.pressed = 1;
-        m_inputmanager.SendMsgEmulator(m_inputmanager.ObjectToByteArray(m_data));
+        m_inputmanager.SendMsgEmulator(ObjectToByteArray(m_data));
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
         if (!sender) return;
         m_data.pressed = 2;
-        m_inputmanager.SendMsgEmulator(m_inputmanager.ObjectToByteArray(m_data));
+        m_inputmanager.SendMsgEmulator(ObjectToByteArray(m_data));
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         if (!sender) return;
+        Debug.Log("EXIT");
+
         m_data.pressed = 3;
-        m_inputmanager.SendMsgEmulator(m_inputmanager.ObjectToByteArray(m_data));
+        m_inputmanager.SendMsgEmulator(ObjectToByteArray(m_data));
     }
 
     private MVRButtonInfo SaveButtonInfo(Transform child, int id)
@@ -118,6 +122,10 @@ public class MVRButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, 
 
         mvrButton.cm = cb.colorMultiplier;
 
+        Navigation navigation = child.GetComponent<Button>().navigation;
+        navigation.mode = Navigation.Mode.None;
+        child.GetComponent<Button>().navigation = navigation;
+
         RectTransform rt = child.GetComponent<RectTransform>();
         mvrButton.x = rt.localPosition.x;
         mvrButton.y = rt.localPosition.y;
@@ -151,6 +159,10 @@ public class MVRButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, 
         cb.colorMultiplier = mvrButton.cm;
         child.GetComponent<Button>().colors = cb;
 
+        Navigation navigation = child.GetComponent<Button>().navigation;
+        navigation.mode = Navigation.Mode.None;
+        child.GetComponent<Button>().navigation = navigation;
+
         child.GetComponent<RectTransform>().localPosition = new Vector3(mvrButton.x, mvrButton.y, mvrButton.z);
         child.GetComponent<RectTransform>().localScale = new Vector3(mvrButton.sx, mvrButton.sy, mvrButton.sz);
         child.GetComponent<RectTransform>().sizeDelta = new Vector2(mvrButton.w, mvrButton.h);
@@ -162,5 +174,14 @@ public class MVRButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, 
 
     }
 
+    public byte[] ObjectToByteArray(System.Object obj)
+    {
+        BinaryFormatter bf = new BinaryFormatter();
+        using (var ms = new MemoryStream())
+        {
+            bf.Serialize(ms, obj);
+            return ms.ToArray();
+        }
+    }
 
 }
