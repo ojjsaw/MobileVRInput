@@ -3,6 +3,7 @@ using MVRInput;
 using UnityEngine.UI;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System.Collections;
 
 public class MVRInputManager : MonoBehaviour
 {
@@ -11,23 +12,13 @@ public class MVRInputManager : MonoBehaviour
     public MVRInputConnection connection = null;
     private MVRInputStatus status = MVRInputStatus.DISCONNECTED;
     private byte[] buffer = new byte[354];
+    private GameObject ButtonPrefab = null;
+    public Hashtable UIElements = new Hashtable();
 
-    public GameObject buttonPrefab;
-    // Use this for initialization
-
-    private void Awake()
+    void Awake()
     {
-        //Check if instance already exists
-        if (instance == null)
-
-            //if not, set instance to this
-            instance = this;
-
-        //If instance already exists and it's not this:
-        else if (instance != this)
-
-            //Then destroy this. This enforces our singleton pattern, meaning there can only ever be one instance of a GameManager.
-            Destroy(gameObject);
+        if (instance == null)instance = this;
+        else if (instance != this) Destroy(gameObject);
     }
 
     void Start()
@@ -46,31 +37,33 @@ public class MVRInputManager : MonoBehaviour
             if (child.GetComponent<Button>() != null)
             {
                 MVRButton mvrButton = child.gameObject.AddComponent<MVRButton>();
-                mvrButton.Initialize(ConnectionType.APP, i);
+                mvrButton.Initialize(ConnectionType.APP, connection, i);
+                UIElements.Add(child.GetComponent<MVRButton>().GetID(), mvrButton);
             }
 
         }
     }
 
-
-    public void SendMsgEmulator(byte[] msg)
-    {
-       // Debug.Log(msg.Length);
-        // emulatorController.Msgs.Enqueue(msg);
-        connection.SendToOther(msg);
-    }
-
-    public void SendData(byte[] msg)
-    {
-        emulatorController.Msgs.Enqueue(msg);
-    }
-
-    // Update is called once per frame
     void Update()
     {
-        status = connection.CheckConnectionStatus(out buffer);
+
+        byte[] recbuffer = new byte[1024];
+        status = connection.CheckConnectionStatus(out recbuffer);
+
         if (status == MVRInputStatus.CONNECTED)
             InitController();
-      //  Debug.Log("Server" + status);
+        else if (status == MVRInputStatus.DATARECEIVED)
+        {
+            System.Object tmp = connection.ByteArrayToObject(recbuffer);
+
+            if (tmp.GetType() == typeof(MVRButtonData))
+            {
+                MVRButtonData data = tmp as MVRButtonData;
+                if (UIElements.Contains(data.id)) (UIElements[data.id] as MVRButton).OnReceiveEvent(tmp as MVRButtonData);
+            }
+        }
     }
+
+    
+
 }

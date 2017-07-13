@@ -13,29 +13,28 @@ public class MVRButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, 
     private MVRInputManager m_inputmanager = null;
     private MVRController m_controllermanager = null;
     private MVRButtonData m_data = null;
-    private bool sender = false;
     private int id = -1;
     private GameObject ButtonPrefab = null;
     private Button bttn = null;
     private PointerEventData pointer = null;
     private ConnectionType applicationType = ConnectionType.GAMEPAD;
+    private MVRInputConnection m_connection = null;
 
-    public void Initialize(ConnectionType applicationType, int elementId = -1)
+    public void Initialize(ConnectionType applicationType, MVRInputConnection connection, int elementId = -1)
     {
         this.applicationType = applicationType;
+        m_connection = connection;
+        id = elementId;
 
         if (this.applicationType == ConnectionType.APP)
         {
-            sender = true;
             m_inputmanager = MVRInputManager.instance;
-            id = elementId;
-            m_inputmanager.SendMsgEmulator(ObjectToByteArray(SaveButtonInfo(this.transform, id)));
-            m_data = new MVRButtonData();
-            m_data.id = id;
-        }else
+            m_connection.SendToOther(m_connection.ObjectToByteArray(SaveButtonInfo(this.transform, id)));
+            pointer = new PointerEventData(EventSystem.current);
+        }
+        else
         {
             m_controllermanager = MVRController.instance;
-            pointer = new PointerEventData(EventSystem.current);
         }
     }
 
@@ -46,7 +45,9 @@ public class MVRButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, 
 
     public void OnReceiveEvent(MVRButtonData data)
     {
-        if(data.pressed == 0) ExecuteEvents.Execute(this.gameObject, pointer, ExecuteEvents.pointerEnterHandler);
+        if (applicationType != ConnectionType.APP) return;
+
+        if (data.pressed == 0) ExecuteEvents.Execute(this.gameObject, pointer, ExecuteEvents.pointerEnterHandler);
         else if (data.pressed == 1) ExecuteEvents.Execute(this.gameObject, pointer, ExecuteEvents.pointerDownHandler);
         else if (data.pressed == 2) ExecuteEvents.Execute(this.gameObject, pointer, ExecuteEvents.pointerUpHandler);
         else if (data.pressed == 3) ExecuteEvents.Execute(this.gameObject, pointer, ExecuteEvents.pointerExitHandler);
@@ -60,32 +61,34 @@ public class MVRButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, 
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (!sender) return;
+        if (applicationType != ConnectionType.GAMEPAD) return;
+
         m_data.pressed = 0;
-        m_inputmanager.SendMsgEmulator(ObjectToByteArray(m_data));
+        m_connection.SendToOther(m_connection.ObjectToByteArray(m_data));
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (!sender) return;
+        if (applicationType != ConnectionType.GAMEPAD) return;
+
         m_data.pressed = 1;
-        m_inputmanager.SendMsgEmulator(ObjectToByteArray(m_data));
+        m_connection.SendToOther(m_connection.ObjectToByteArray(m_data));
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        if (!sender) return;
+        if (applicationType != ConnectionType.GAMEPAD) return;
+
         m_data.pressed = 2;
-        m_inputmanager.SendMsgEmulator(ObjectToByteArray(m_data));
+        m_connection.SendToOther(m_connection.ObjectToByteArray(m_data));
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (!sender) return;
-        Debug.Log("EXIT");
+        if (applicationType != ConnectionType.GAMEPAD) return;
 
         m_data.pressed = 3;
-        m_inputmanager.SendMsgEmulator(ObjectToByteArray(m_data));
+        m_connection.SendToOther(m_connection.ObjectToByteArray(m_data));
     }
 
     private MVRButtonInfo SaveButtonInfo(Transform child, int id)
@@ -125,6 +128,9 @@ public class MVRButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, 
         Navigation navigation = child.GetComponent<Button>().navigation;
         navigation.mode = Navigation.Mode.None;
         child.GetComponent<Button>().navigation = navigation;
+
+        //child.GetComponent<Button>().interactable = false;
+        //child.GetComponent<Image>().raycastTarget = false;
 
         RectTransform rt = child.GetComponent<RectTransform>();
         mvrButton.x = rt.localPosition.x;
@@ -172,16 +178,8 @@ public class MVRButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, 
         bttn = child.GetComponent<Button>();
         id = mvrButton.id;
 
-    }
-
-    public byte[] ObjectToByteArray(System.Object obj)
-    {
-        BinaryFormatter bf = new BinaryFormatter();
-        using (var ms = new MemoryStream())
-        {
-            bf.Serialize(ms, obj);
-            return ms.ToArray();
-        }
+        m_data = new MVRButtonData();
+        m_data.id = id;
     }
 
 }

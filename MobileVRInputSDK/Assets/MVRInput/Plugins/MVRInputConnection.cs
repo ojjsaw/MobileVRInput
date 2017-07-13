@@ -2,6 +2,8 @@
 {
     using UnityEngine.Networking;
     using UnityEngine;
+    using System.Runtime.Serialization.Formatters.Binary;
+    using System.IO;
 
     public class MVRInputConnection
     {
@@ -61,7 +63,7 @@
         public MVRInputStatus CheckConnectionStatus(out byte[] buffer)
         {
             //TODO: Allocate Buffer
-            byte[] _recbuffer = new byte[354];
+            byte[] _recbuffer = new byte[1024];
             buffer = null;
             int _recdataSize;
             byte _recerror;
@@ -97,7 +99,6 @@
 
         public MVRInputStatus SendToOther(byte[] _sendbuffer = null)
         {
-            //TODO: Allocate Buffer
             byte _senderror;
             if (NetworkTransport.Send(sockedId, otherConnectionId, otherChannelId, _sendbuffer, _sendbuffer.Length, out _senderror))
             {
@@ -107,6 +108,27 @@
             return MVRInputStatus.FAILEDTOSEND;
         }
 
+        public byte[] ObjectToByteArray(System.Object obj)
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            using (var ms = new MemoryStream())
+            {
+                bf.Serialize(ms, obj);
+                return ms.ToArray();
+            }
+        }
+
+        public System.Object ByteArrayToObject(byte[] arrBytes)
+        {
+            using (var memStream = new MemoryStream())
+            {
+                var binForm = new BinaryFormatter();
+                memStream.Write(arrBytes, 0, arrBytes.Length);
+                memStream.Seek(0, SeekOrigin.Begin);
+                System.Object obj = binForm.Deserialize(memStream);
+                return obj;
+            }
+        }
 
     }
 }
