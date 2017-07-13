@@ -14,6 +14,7 @@ public class MVRInputManager : MonoBehaviour
     private byte[] buffer = new byte[354];
     private GameObject ButtonPrefab = null;
     public Hashtable UIElements = new Hashtable();
+    public Text ipText;
 
     void Awake()
     {
@@ -24,6 +25,7 @@ public class MVRInputManager : MonoBehaviour
     void Start()
     {
         connection = new MVRInputConnection(ConnectionType.APP);
+        ipText.text = "IP: " + connection.ServerIP;
     }
 
     void InitController()
@@ -60,6 +62,10 @@ public class MVRInputManager : MonoBehaviour
             {
                 MVRButtonData data = tmp as MVRButtonData;
                 if (UIElements.Contains(data.id)) (UIElements[data.id] as MVRButton).OnReceiveEvent(tmp as MVRButtonData);
+            }else if(tmp.GetType() == typeof(MVROrientationData))
+            {
+                MVROrientationData data = tmp as MVROrientationData;
+                this.gameObject.transform.rotation = new Quaternion(data.x, data.y, data.z, data.w);
             }
         }
     }

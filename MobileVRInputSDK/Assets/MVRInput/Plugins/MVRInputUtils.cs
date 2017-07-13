@@ -76,4 +76,10 @@
         public int id = -1;
         public int pressed = -1; //0 = Enter, 1 = Down, 2 = Up
     }
+
+    [Serializable]
+    public class MVROrientationData
+    {
+        public float x, y, z, w;
+    }
 }

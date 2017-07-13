@@ -14,7 +14,7 @@ public class MVRController : MonoBehaviour {
     public Hashtable UIElements = new Hashtable();
     public MVRInputConnection connection = null;
     private MVRInputStatus status = MVRInputStatus.NONE;
-
+    private MVROrientationData orientationData = new MVROrientationData();
     void Awake () {
 
         if (instance == null) instance = this;
@@ -22,13 +22,20 @@ public class MVRController : MonoBehaviour {
 
         ButtonPrefab = Resources.Load("ButtonPrefab") as GameObject;
 
-        connection = new MVRInputConnection(ConnectionType.GAMEPAD);
-        Debug.Log(connection.ConnectToServer("10.0.0.206"));
+        Input.gyro.enabled = true;
+    }
 
+    public MVRInputStatus Connect(string ipaddress)
+    {
+        connection = new MVRInputConnection(ConnectionType.GAMEPAD);
+        var sts = connection.ConnectToServer(ipaddress);
+        if (sts != MVRInputStatus.CONNECTED) connection = null;
+        return sts;
     }
 
     void Update()
     {
+        if (connection == null) return;
 
         byte[] recbuffer = new byte[1024];
         status = connection.CheckConnectionStatus(out recbuffer);
@@ -45,6 +52,19 @@ public class MVRController : MonoBehaviour {
                 UIElements.Add(child.GetComponent<MVRButton>().GetID(), mvrButton);
             }
         }
+
+        var rotation = Input.gyro.attitude;
+        orientationData.x = rotation.x;
+        orientationData.y = rotation.y;
+        orientationData.z = rotation.z;
+        orientationData.w = rotation.w;
+
+        connection.SendToOther(connection.ObjectToByteArray(orientationData));
+
     }
 
+    private void OnDisable()
+    {
+        Input.gyro.enabled = false;
+    }
 }
