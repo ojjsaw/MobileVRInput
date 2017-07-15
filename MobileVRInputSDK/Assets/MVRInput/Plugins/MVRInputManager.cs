@@ -15,6 +15,10 @@ public class MVRInputManager : MonoBehaviour
     private GameObject ButtonPrefab = null;
     public Hashtable UIElements = new Hashtable();
     public Text ipText;
+    private Transform screen;
+
+    public delegate void OrientationData(Quaternion gyro, Vector3 accelerometer);
+    public static event OrientationData OnOrientation;
 
     void Awake()
     {
@@ -30,7 +34,7 @@ public class MVRInputManager : MonoBehaviour
 
     void InitController()
     {
-        Transform screen = transform.GetChild(0);
+        screen = transform.GetChild(0);
         int numOfMVRUI = screen.childCount;
         for (int i = 0; i < numOfMVRUI; i++)
         {
@@ -65,7 +69,10 @@ public class MVRInputManager : MonoBehaviour
             }else if(tmp.GetType() == typeof(MVROrientationData))
             {
                 MVROrientationData data = tmp as MVROrientationData;
-                this.gameObject.transform.rotation = new Quaternion(data.x, data.y, data.z, data.w);
+                if (OnOrientation != null)
+                    OnOrientation(new Quaternion(data.g_x, data.g_y, data.g_z, data.g_w), new Vector3(data.a_x, data.a_y, data.a_z));
+
+                //screen.localRotation = new Quaternion(data.x, data.y, data.z, data.w);
             }
         }
     }

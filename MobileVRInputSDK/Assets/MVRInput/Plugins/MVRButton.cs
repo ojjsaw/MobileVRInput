@@ -80,7 +80,7 @@ public class MVRButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, 
         if (applicationType != ConnectionType.GAMEPAD) return;
 
         m_data.pressed = 2;
-        m_connection.SendToOther(m_connection.ObjectToByteArray(m_data));
+        m_connection.SendToOther(m_connection.ObjectToByteArray(m_data));      
     }
 
     public void OnPointerExit(PointerEventData eventData)

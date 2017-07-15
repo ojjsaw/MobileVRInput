@@ -15,6 +15,8 @@ public class MVRController : MonoBehaviour {
     public MVRInputConnection connection = null;
     private MVRInputStatus status = MVRInputStatus.NONE;
     private MVROrientationData orientationData = new MVROrientationData();
+    private bool sendOrientation = false;
+
     void Awake () {
 
         if (instance == null) instance = this;
@@ -22,7 +24,6 @@ public class MVRController : MonoBehaviour {
 
         ButtonPrefab = Resources.Load("ButtonPrefab") as GameObject;
 
-        Input.gyro.enabled = true;
     }
 
     public MVRInputStatus Connect(string ipaddress)
@@ -30,6 +31,13 @@ public class MVRController : MonoBehaviour {
         connection = new MVRInputConnection(ConnectionType.GAMEPAD);
         var sts = connection.ConnectToServer(ipaddress);
         if (sts != MVRInputStatus.CONNECTED) connection = null;
+        else
+        {
+            Input.gyro.enabled = true;
+            sendOrientation = true;
+            StartCoroutine("OrientationProcessor");
+
+        }
         return sts;
     }
 
@@ -53,18 +61,33 @@ public class MVRController : MonoBehaviour {
             }
         }
 
-        var rotation = Input.gyro.attitude;
-        orientationData.x = rotation.x;
-        orientationData.y = rotation.y;
-        orientationData.z = rotation.z;
-        orientationData.w = rotation.w;
+    }
 
-        connection.SendToOther(connection.ObjectToByteArray(orientationData));
+    IEnumerator OrientationProcessor()
+    {
+        while(sendOrientation)
+        {
+            var rotation = Input.gyro.attitude;
+            orientationData.g_x = rotation.x;
+            orientationData.g_y = rotation.y;
+            orientationData.g_z = rotation.z;
+            orientationData.g_w = rotation.w;
 
+            var acc = Input.acceleration;
+            orientationData.a_x = acc.x;
+            orientationData.a_y = acc.y;
+            orientationData.a_z = acc.z;
+
+            connection.SendToOther(connection.ObjectToByteArray(orientationData));
+
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 
     private void OnDisable()
     {
+        sendOrientation = false;
+        StopCoroutine("OrientationProcessor");
         Input.gyro.enabled = false;
     }
 }

@@ -80,6 +80,7 @@
     [Serializable]
     public class MVROrientationData
     {
-        public float x, y, z, w;
+        public float g_x, g_y, g_z, g_w;
+        public float a_x, a_y, a_z;
     }
 }
