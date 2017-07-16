@@ -83,4 +83,10 @@
         public float g_x, g_y, g_z, g_w;
         public float a_x, a_y, a_z;
     }
+
+    [Serializable]
+    public class MVRToggleData
+    {
+        public bool toggle;
+    }
 }

@@ -16,7 +16,7 @@ public class MVRInputManager : MonoBehaviour
     public Hashtable UIElements = new Hashtable();
     public Text ipText;
     private Transform screen;
-
+    
     public delegate void OrientationData(Quaternion gyro, Vector3 accelerometer);
     public static event OrientationData OnOrientation;
 
@@ -73,6 +73,13 @@ public class MVRInputManager : MonoBehaviour
                     OnOrientation(new Quaternion(data.g_x, data.g_y, data.g_z, data.g_w), new Vector3(data.a_x, data.a_y, data.a_z));
 
                 //screen.localRotation = new Quaternion(data.x, data.y, data.z, data.w);
+            }
+            else if (tmp.GetType() == typeof(MVRToggleData))
+            {
+                if (GetComponent<CanvasGroup>().alpha == 0)
+                    GetComponent<CanvasGroup>().alpha = 1;
+                else
+                    GetComponent<CanvasGroup>().alpha = 0;
             }
         }
     }

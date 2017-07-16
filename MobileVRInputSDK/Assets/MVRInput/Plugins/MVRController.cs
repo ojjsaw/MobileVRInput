@@ -16,6 +16,7 @@ public class MVRController : MonoBehaviour {
     private MVRInputStatus status = MVRInputStatus.NONE;
     private MVROrientationData orientationData = new MVROrientationData();
     private bool sendOrientation = false;
+    private byte[] toggleBytes; 
 
     void Awake () {
 
@@ -23,7 +24,6 @@ public class MVRController : MonoBehaviour {
         else if (instance != this) Destroy(gameObject);
 
         ButtonPrefab = Resources.Load("ButtonPrefab") as GameObject;
-
     }
 
     public MVRInputStatus Connect(string ipaddress)
@@ -33,6 +33,10 @@ public class MVRController : MonoBehaviour {
         if (sts != MVRInputStatus.CONNECTED) connection = null;
         else
         {
+            MVRToggleData toggleData = new MVRToggleData();
+            toggleData.toggle = true;
+            toggleBytes = connection.ObjectToByteArray(toggleData);
+
             Input.gyro.enabled = true;
             sendOrientation = true;
             StartCoroutine("OrientationProcessor");
@@ -47,7 +51,7 @@ public class MVRController : MonoBehaviour {
 
         byte[] recbuffer = new byte[1024];
         status = connection.CheckConnectionStatus(out recbuffer);
-        
+
         if (status == MVRInputStatus.DATARECEIVED)
         {
             System.Object tmp = connection.ByteArrayToObject(recbuffer);
@@ -61,6 +65,20 @@ public class MVRController : MonoBehaviour {
             }
         }
 
+        int touchCount = Input.touchCount;
+        if (touchCount > 1)
+        {
+            if (Input.GetTouch(0).position.y > (Screen.height - Screen.height / 10)
+                && Input.GetTouch(1).position.y > (Screen.height - Screen.height / 10))
+            {
+                if(Input.GetTouch(0).position.x < Screen.width / 10
+                    || Input.GetTouch(1).position.x < Screen.width / 10)
+                {
+                    connection.SendToOther(toggleBytes);
+                }
+            }
+
+        }
     }
 
     IEnumerator OrientationProcessor()
