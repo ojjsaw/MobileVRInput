@@ -10,6 +10,7 @@ namespace UnityStandardAssets.Vehicles.Car
     {
         private CarController m_Car; // the car controller we want to use
         public float hor, ver;
+        public GameObject steeringWheel;
 
         private void Awake()
         {
@@ -47,6 +48,7 @@ namespace UnityStandardAssets.Vehicles.Car
         private void MVRInputManager_OnOrientation(Quaternion gyro, Vector3 acc)
         {
             hor = acc.x;
+            steeringWheel.transform.Rotate(new Vector3(0, hor*8, 0));
         }
 
         void OnDisable()

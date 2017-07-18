@@ -807,6 +807,21 @@ Prefab:
       propertyPath: m_UiScaleMode
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114726645437057436, guid: 8b86005ad18d30a43922b85245fdd78c,
+        type: 2}
+      propertyPath: m_ReferenceResolution.x
+      value: 316
+      objectReference: {fileID: 0}
+    - target: {fileID: 114726645437057436, guid: 8b86005ad18d30a43922b85245fdd78c,
+        type: 2}
+      propertyPath: m_ReferenceResolution.y
+      value: 700
+      objectReference: {fileID: 0}
+    - target: {fileID: 114726645437057436, guid: 8b86005ad18d30a43922b85245fdd78c,
+        type: 2}
+      propertyPath: m_MatchWidthOrHeight
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8b86005ad18d30a43922b85245fdd78c, type: 2}
   m_IsPrefabParent: 0

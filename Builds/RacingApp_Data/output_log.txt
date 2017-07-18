@@ -24,9 +24,9 @@ Platform assembly: C:\GitHub\MobileVRInput\Builds\RacingApp_Data\Managed\System.
 XInput1_3.dll not found. Trying XInput9_1_0.dll instead...
 <RI> Input initialized.
 <RI> Initialized touch support.
-UnloadTime: 0.832000 ms
+UnloadTime: 0.803556 ms
 Setting up 4 worker threads for Enlighten.
-  Thread -> id: 3d18 -> priority: 1 
-  Thread -> id: 5e94 -> priority: 1 
-  Thread -> id: 1970 -> priority: 1 
-  Thread -> id: 1914 -> priority: 1 
+  Thread -> id: 38b4 -> priority: 1 
+  Thread -> id: 38b8 -> priority: 1 
+  Thread -> id: 38bc -> priority: 1 
+  Thread -> id: 38c0 -> priority: 1 
