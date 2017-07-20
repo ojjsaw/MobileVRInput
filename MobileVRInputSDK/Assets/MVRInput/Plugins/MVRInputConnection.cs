@@ -24,6 +24,14 @@
             }
         }
 
+        public bool IsConnected
+        {
+            get
+            {
+                return isConnected;
+            }
+        }
+
         private int otherConnectionId = -1;
         private int otherChannelId = -1;
         private int otherHostId = -1;
@@ -46,6 +54,15 @@
 
         }
 
+        public void Close()
+        {
+            byte error;
+            NetworkTransport.Disconnect(sockedId, otherConnectionId, out error);
+            NetworkTransport.RemoveHost(sockedId);
+            otherConnectionId = otherChannelId = otherHostId = -1;
+            isConnected = false;
+        }
+
         public MVRInputStatus ConnectToServer(string serverAddress)
         {
             byte error;
@@ -54,8 +71,11 @@
             {
                 NetworkError nerror = (NetworkError)error;
                 Debug.Log("Error: " + nerror.ToString());
+                isConnected = false;
                 return MVRInputStatus.FAILEDTOCONNECT;
             }
+
+            isConnected = true;
 
             return MVRInputStatus.CONNECTED;
         }
@@ -87,6 +107,7 @@
                     break;
                 case NetworkEventType.DisconnectEvent:
                     isConnected = false;
+                    Close();
                     status = MVRInputStatus.DISCONNECTED;
                     break;
                 default:
@@ -99,6 +120,8 @@
 
         public MVRInputStatus SendToOther(byte[] _sendbuffer = null)
         {
+            if (!isConnected) return MVRInputStatus.DISCONNECTED;
+
             byte _senderror;
             if (NetworkTransport.Send(sockedId, otherConnectionId, otherChannelId, _sendbuffer, _sendbuffer.Length, out _senderror))
             {

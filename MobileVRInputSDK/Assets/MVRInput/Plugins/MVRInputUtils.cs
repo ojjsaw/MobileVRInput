@@ -84,9 +84,4 @@
         public float a_x, a_y, a_z;
     }
 
-    [Serializable]
-    public class MVRToggleData
-    {
-        public bool toggle;
-    }
 }

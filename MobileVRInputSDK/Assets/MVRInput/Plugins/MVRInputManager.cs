@@ -74,14 +74,13 @@ public class MVRInputManager : MonoBehaviour
 
                 //screen.localRotation = new Quaternion(data.x, data.y, data.z, data.w);
             }
-            else if (tmp.GetType() == typeof(MVRToggleData))
-            {
-                if (GetComponent<CanvasGroup>().alpha == 0)
-                    GetComponent<CanvasGroup>().alpha = 1;
-                else
-                    GetComponent<CanvasGroup>().alpha = 0;
-            }
         }
+    }
+
+    void OnDisable()
+    {
+        connection.Close();
+        connection = null;
     }
 
     

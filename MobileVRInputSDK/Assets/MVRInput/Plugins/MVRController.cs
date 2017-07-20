@@ -16,7 +16,7 @@ public class MVRController : MonoBehaviour {
     private MVRInputStatus status = MVRInputStatus.NONE;
     private MVROrientationData orientationData = new MVROrientationData();
     private bool sendOrientation = false;
-    private byte[] toggleBytes; 
+    public string connectedIP = "NONE";
 
     void Awake () {
 
@@ -30,12 +30,14 @@ public class MVRController : MonoBehaviour {
     {
         connection = new MVRInputConnection(ConnectionType.GAMEPAD);
         var sts = connection.ConnectToServer(ipaddress);
-        if (sts != MVRInputStatus.CONNECTED) connection = null;
+        if (sts != MVRInputStatus.CONNECTED)
+        {
+            connection.Close();
+            connection = null;
+        }
         else
         {
-            MVRToggleData toggleData = new MVRToggleData();
-            toggleData.toggle = true;
-            toggleBytes = connection.ObjectToByteArray(toggleData);
+            connectedIP = ipaddress;
 
             Input.gyro.enabled = true;
             sendOrientation = true;
@@ -47,6 +49,25 @@ public class MVRController : MonoBehaviour {
 
     void Update()
     {
+        if (connection != null && !connection.IsConnected)
+        {
+            foreach (Transform child in transform)
+            {
+                GameObject.Destroy(child.gameObject);
+            }
+
+            Debug.Log("deleting");
+            UIElements.Clear();
+
+            connection.Close();
+            connection = null;
+        }
+    
+        if (connection == null && connectedIP != "NONE")
+        {
+            Connect(connectedIP);
+        }
+
         if (connection == null) return;
 
         byte[] recbuffer = new byte[1024];
@@ -65,20 +86,6 @@ public class MVRController : MonoBehaviour {
             }
         }
 
-        int touchCount = Input.touchCount;
-        if (touchCount > 1)
-        {
-            if (Input.GetTouch(0).position.y > (Screen.height - Screen.height / 10)
-                && Input.GetTouch(1).position.y > (Screen.height - Screen.height / 10))
-            {
-                if(Input.GetTouch(0).position.x < Screen.width / 10
-                    || Input.GetTouch(1).position.x < Screen.width / 10)
-                {
-                    connection.SendToOther(toggleBytes);
-                }
-            }
-
-        }
     }
 
     IEnumerator OrientationProcessor()
