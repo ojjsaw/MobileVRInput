@@ -8,9 +8,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/MVRInput/Scenes/MVRInputSample.unity
     guid: 565ba85a36d50d34b887981720e28de3
-  - enabled: 0
+  - enabled: 1
     path: Assets/MVRInput/Scenes/MVRInputController.unity
     guid: 5bf21be68ee544040af0235829b4e1e4
-  - enabled: 1
-    path: Assets/Samples/Sports/Scenes/CarRacing.unity
+  - enabled: 0
+    path: Assets/Samples/Scenes/Home.unity
+    guid: 07dd679945bde434e902bf736b08eb8a
+  - enabled: 0
+    path: Assets/Samples/Scenes/CarRacing.unity
     guid: 1662cd929a3fd284c91881c84c3a5548
