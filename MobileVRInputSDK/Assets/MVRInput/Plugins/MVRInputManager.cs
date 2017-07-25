@@ -20,6 +20,9 @@ public class MVRInputManager : MonoBehaviour
     public delegate void OrientationData(Quaternion gyro, Vector3 accelerometer);
     public static event OrientationData OnOrientation;
 
+    public delegate void TouchSwipeData(MVRSide screenSide, MVRSide swipeDirection);
+    public static event TouchSwipeData OnTouchSwipe;
+
     void Awake()
     {
         if (instance == null)instance = this;
@@ -73,6 +76,11 @@ public class MVRInputManager : MonoBehaviour
                     OnOrientation(new Quaternion(data.g_x, data.g_y, data.g_z, data.g_w), new Vector3(data.a_x, data.a_y, data.a_z));
 
                 //screen.localRotation = new Quaternion(data.x, data.y, data.z, data.w);
+            }else if (tmp.GetType() == typeof(MVRTouchSwipeData))
+            {
+                MVRTouchSwipeData data = tmp as MVRTouchSwipeData;
+                if (OnTouchSwipe != null)
+                    OnTouchSwipe((MVRSide)data.scrnSide, (MVRSide)data.swipeDirection);
             }
         }
     }
@@ -83,6 +91,12 @@ public class MVRInputManager : MonoBehaviour
         connection = null;
     }
 
-    
+}
 
+public enum MVRSide
+{
+    LEFT = 0,
+    RIGHT = 1,
+    UP = 2,
+    DOWN = 3
 }

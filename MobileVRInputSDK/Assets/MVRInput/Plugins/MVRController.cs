@@ -17,6 +17,12 @@ public class MVRController : MonoBehaviour {
     private MVROrientationData orientationData = new MVROrientationData();
     private bool sendOrientation = false;
     public string connectedIP = "NONE";
+    private MVRTouchSwipeData swipeData = new MVRTouchSwipeData();
+    private float minSwipeDistY;
+    private Vector2 startPos;
+    private float minSwipeDistX;
+    private int pixelCenter;
+    private int skipCount = 0;
 
     void Awake () {
 
@@ -41,11 +47,18 @@ public class MVRController : MonoBehaviour {
 
             Input.gyro.enabled = true;
             sendOrientation = true;
-            StartCoroutine("OrientationProcessor");
 
+            minSwipeDistY = Camera.main.pixelHeight / 4.5f;
+            minSwipeDistX = Camera.main.pixelWidth / 5f;
+            pixelCenter = Camera.main.pixelWidth / 2;
+            startPos = Vector2.zero;
+            skipCount = 0;
+
+            StartCoroutine("OrientationProcessor");
         }
         return sts;
     }
+
 
     void Update()
     {
@@ -83,6 +96,60 @@ public class MVRController : MonoBehaviour {
                 mvrButton.Initialize(ConnectionType.GAMEPAD, connection);
                 mvrButton.OnReceiveEvent(tmp as MVRButtonInfo);
                 UIElements.Add(child.GetComponent<MVRButton>().GetID(), mvrButton);
+            }
+        }
+
+        if(Input.touchCount > 0)
+        {
+            Touch touch = Input.touches[0];
+
+            if (touch.position.x > pixelCenter) swipeData.scrnSide = 1; // right scrn side
+            else if (touch.position.x < pixelCenter) swipeData.scrnSide = 0; // left scrn side
+            else return;
+
+            switch (touch.phase)
+            {
+                case TouchPhase.Began:
+                    startPos = touch.position;
+                    break;
+                case TouchPhase.Ended:
+                    float swipeDistVertical = (new Vector3(0, touch.position.y, 0) - new Vector3(0, startPos.y, 0)).magnitude;
+                    if (swipeDistVertical > minSwipeDistY)
+                    {
+                        float swipeValue = Mathf.Sign(touch.position.y - startPos.y);
+                        if (swipeValue > 0)
+                        {
+                            swipeData.swipeDirection = 2; //up
+                            skipCount++;
+                            if(skipCount > 1) connection.SendToOther(connection.ObjectToByteArray(swipeData));
+                        }
+                        else if (swipeValue < 0)
+                        {
+                            swipeData.swipeDirection = 3; //down
+                            skipCount++;
+                            if (skipCount > 1) connection.SendToOther(connection.ObjectToByteArray(swipeData));
+                        }
+                    }
+                    float swipeDistHorizontal = (new Vector3(touch.position.x, 0, 0) - new Vector3(startPos.x, 0, 0)).magnitude;
+                    if (swipeDistHorizontal > minSwipeDistX)
+                    {
+                        float swipeValue = Mathf.Sign(touch.position.x - startPos.x);
+                        if (swipeValue > 0)
+                        {
+                            swipeData.swipeDirection = 1; //right
+                            skipCount++;
+                            if (skipCount > 1) connection.SendToOther(connection.ObjectToByteArray(swipeData));
+                        }
+                        else if (swipeValue < 0)
+                        {
+                            swipeData.swipeDirection = 0; //left
+                            skipCount++;
+                            if (skipCount > 1) connection.SendToOther(connection.ObjectToByteArray(swipeData));
+                        }
+                    }
+                    break;
+                default:
+                    break;
             }
         }
 

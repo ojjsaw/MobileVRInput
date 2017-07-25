@@ -84,4 +84,11 @@
         public float a_x, a_y, a_z;
     }
 
+    [Serializable]
+    public class MVRTouchSwipeData
+    {
+        public int scrnSide; //0 = left, 1= right
+        public int swipeDirection; // 0-left, 1-right, 2-up, 3-down
+    }
+
 }
