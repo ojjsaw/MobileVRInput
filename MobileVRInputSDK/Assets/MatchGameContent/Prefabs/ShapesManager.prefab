@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1327117686104580}
+  m_IsPrefabParent: 1
+--- !u!1 &1327117686104580
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4648827903571434}
+  - component: {fileID: 114625564912636826}
+  m_Layer: 0
+  m_Name: ShapesManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4648827903571434
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1327117686104580}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.66466385, y: -2.407161, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114625564912636826
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1327117686104580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc043a35351bec840a343783f285c0aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DebugText: {fileID: 0}
+  ScoreText: {fileID: 0}
+  ShowDebugInfo: 0
+  CandyPrefabs:
+  - {fileID: 189422, guid: 110002167b804ad47947089afdb9dc96, type: 2}
+  - {fileID: 103784, guid: 55a0b063029169245b7743f43014b9d5, type: 2}
+  - {fileID: 161608, guid: 1cfccd74339afd54c8eea25deb0e8aae, type: 2}
+  - {fileID: 187046, guid: a4cb29e7d50f91041b867892963b1cf9, type: 2}
+  - {fileID: 180178, guid: afa6b0eba9a9e794080048baed797d27, type: 2}
+  ExplosionPrefabs:
+  - {fileID: 126096, guid: 76ac26693b05fa94381733a6e6be640a, type: 2}
+  - {fileID: 195492, guid: 4ee919a3cb1ff3448ae1b4c056dd8c35, type: 2}
+  - {fileID: 125858, guid: 5268d9197b90bc44492e32f316fa679e, type: 2}
+  - {fileID: 123910, guid: 1d881f16d2f366c46afb3f9e9b96654f, type: 2}
+  BonusPrefabs:
+  - {fileID: 114848, guid: 0cffe7839950f2d4c8ec4e7f3e18e4c6, type: 2}
+  - {fileID: 164388, guid: ddfddbe43693aa54c94149217791f7bd, type: 2}
+  - {fileID: 105690, guid: c9cde8189605ee449bcc97b998147d85, type: 2}
+  - {fileID: 187842, guid: 11cb4356a18183c48b07164222227d2b, type: 2}
+  - {fileID: 157836, guid: 19c708ee61002454eb4c54c029ce0eaf, type: 2}
+  soundManager: {fileID: 0}

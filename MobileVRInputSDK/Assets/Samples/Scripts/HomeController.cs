@@ -22,7 +22,7 @@ public class HomeController : MonoBehaviour, IPointerDownHandler
                 SceneManager.LoadScene("CarRacing");
                 break;
             case Panels.PANEL2:
-                SceneManager.LoadScene("CarRacing");
+                SceneManager.LoadScene("Candy");
                 break;
             case Panels.PANEL3:
                 SceneManager.LoadScene("CarRacing");

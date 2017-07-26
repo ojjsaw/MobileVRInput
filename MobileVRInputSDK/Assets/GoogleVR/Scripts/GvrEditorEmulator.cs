@@ -87,13 +87,15 @@ public class GvrEditorEmulator : MonoBehaviour {
 
     Vector3 camPosition = m_camera.transform.position;
     camPosition.y = neck.y;
-    m_camera.transform.localPosition = neck;
+   // m_camera.transform.localPosition = neck;
     m_camera.transform.localRotation = rot;
   }
 #endif  // UNITY_EDITOR && UNITY_HAS_GOOGLEVR && (UNITY_ANDROID || UNITY_IOS)
 
   public void Recenter()
   {
+        return;
+
 #if UNITY_EDITOR && UNITY_HAS_GOOGLEVR && (UNITY_ANDROID || UNITY_IOS)
     if (m_isRecenterOnlyController)
     {
