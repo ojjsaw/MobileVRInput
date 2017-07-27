@@ -19,12 +19,15 @@ public class HomeController : MonoBehaviour, IPointerDownHandler
         switch(currPanel)
         {
             case Panels.PANEL1:
+                MVRInputManager.instance.DisableAllconfiguration();
                 SceneManager.LoadScene("CarRacing");
                 break;
             case Panels.PANEL2:
+                MVRInputManager.instance.DisableAllconfiguration();
                 SceneManager.LoadScene("Candy");
                 break;
             case Panels.PANEL3:
+                MVRInputManager.instance.DisableAllconfiguration();
                 SceneManager.LoadScene("CarRacing");
                 break;
             default:

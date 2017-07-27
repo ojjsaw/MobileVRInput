@@ -62,6 +62,7 @@ public class MVRButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, 
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (applicationType != ConnectionType.GAMEPAD) return;
+        if (m_controllermanager.enableButtonData == false) return;
 
         m_data.pressed = 0;
         m_connection.SendToOther(m_connection.ObjectToByteArray(m_data));
@@ -70,6 +71,7 @@ public class MVRButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, 
     public void OnPointerDown(PointerEventData eventData)
     {
         if (applicationType != ConnectionType.GAMEPAD) return;
+        if (m_controllermanager.enableButtonData == false) return;
 
         m_data.pressed = 1;
         m_connection.SendToOther(m_connection.ObjectToByteArray(m_data));
@@ -78,6 +80,7 @@ public class MVRButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, 
     public void OnPointerUp(PointerEventData eventData)
     {
         if (applicationType != ConnectionType.GAMEPAD) return;
+        if (m_controllermanager.enableButtonData == false) return;
 
         m_data.pressed = 2;
         m_connection.SendToOther(m_connection.ObjectToByteArray(m_data));      
@@ -86,6 +89,7 @@ public class MVRButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, 
     public void OnPointerExit(PointerEventData eventData)
     {
         if (applicationType != ConnectionType.GAMEPAD) return;
+        if (m_controllermanager.enableButtonData == false) return;
 
         m_data.pressed = 3;
         m_connection.SendToOther(m_connection.ObjectToByteArray(m_data));

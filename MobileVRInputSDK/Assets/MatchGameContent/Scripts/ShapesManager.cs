@@ -16,7 +16,7 @@ public class ShapesManager : MonoBehaviour
     private int score;
 
     public readonly Vector2 BottomRight = new Vector2(-2.37f, -4.27f);
-    public readonly Vector2 CandySize = new Vector2(1.25f, 1.25f);
+    public readonly Vector2 CandySize = new Vector2(1.5f, 1.5f);
 
     private GameState state = GameState.None;
     private GameObject hitGo = null;
@@ -267,7 +267,7 @@ public class ShapesManager : MonoBehaviour
             RaycastHit hit;
             Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);// Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            if (Physics.Raycast(ray, out hit, 100.0f))
+            if (Physics.Raycast(ray, out hit, 200.0f))
             {
                 Debug.Log(hit.transform.name);
 

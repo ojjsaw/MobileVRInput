@@ -23,6 +23,9 @@ public class MVRInputManager : MonoBehaviour
     public delegate void TouchSwipeData(MVRSide screenSide, MVRSide swipeDirection);
     public static event TouchSwipeData OnTouchSwipe;
 
+    public bool enableTouchSwipe = false;
+    public bool enableOrientation = false;
+
     void Awake()
     {
         if (instance == null)instance = this;
@@ -60,7 +63,11 @@ public class MVRInputManager : MonoBehaviour
         status = connection.CheckConnectionStatus(out recbuffer);
 
         if (status == MVRInputStatus.CONNECTED)
+        {
             InitController();
+            EnableConfiguration(enableOrientation, enableTouchSwipe);
+            ipText.text = "CONNECTED";
+        }
         else if (status == MVRInputStatus.DATARECEIVED)
         {
             System.Object tmp = connection.ByteArrayToObject(recbuffer);
@@ -87,10 +94,30 @@ public class MVRInputManager : MonoBehaviour
 
     void OnDisable()
     {
+        DisableAllconfiguration();
         connection.Close();
         connection = null;
+        enableTouchSwipe = false;
+        enableOrientation = false;
     }
 
+    public void DisableAllconfiguration()
+    {
+        MVRConfigurationData data = new MVRConfigurationData();
+        data.enableOrientationData = false;
+        data.enableTouchSwipeData = false;
+        data.enableButtonData = false;
+        connection.SendToOther(connection.ObjectToByteArray(data));
+    }
+
+    public void EnableConfiguration(bool orientation, bool touchswipe)
+    {
+        MVRConfigurationData data = new MVRConfigurationData();
+        data.enableOrientationData = orientation;
+        data.enableTouchSwipeData = touchswipe;
+        data.enableButtonData = true;
+        connection.SendToOther(connection.ObjectToByteArray(data));
+    }
 }
 
 public enum MVRSide

@@ -23,6 +23,8 @@ public class MVRController : MonoBehaviour {
     private float minSwipeDistX;
     private int pixelCenter;
     private int skipCount = 0;
+    public bool enableButtonData = false;
+    private bool enableTouchSwipeData = false;
 
     void Awake () {
 
@@ -44,17 +46,6 @@ public class MVRController : MonoBehaviour {
         else
         {
             connectedIP = ipaddress;
-
-            Input.gyro.enabled = true;
-            sendOrientation = true;
-
-            minSwipeDistY = Camera.main.pixelHeight / 4.5f;
-            minSwipeDistX = Camera.main.pixelWidth / 5f;
-            pixelCenter = Camera.main.pixelWidth / 2;
-            startPos = Vector2.zero;
-            skipCount = 0;
-
-            StartCoroutine("OrientationProcessor");
         }
         return sts;
     }
@@ -68,6 +59,10 @@ public class MVRController : MonoBehaviour {
             {
                 GameObject.Destroy(child.gameObject);
             }
+
+            enableButtonData = false;
+            enableTouchSwipeData = false;
+            sendOrientation = false;
 
             Debug.Log("deleting");
             UIElements.Clear();
@@ -97,9 +92,37 @@ public class MVRController : MonoBehaviour {
                 mvrButton.OnReceiveEvent(tmp as MVRButtonInfo);
                 UIElements.Add(child.GetComponent<MVRButton>().GetID(), mvrButton);
             }
+            else if (tmp.GetType() == typeof(MVRConfigurationData))
+            {
+                MVRConfigurationData data = tmp as MVRConfigurationData;
+                enableButtonData = data.enableButtonData;
+
+                if (data.enableOrientationData)
+                {
+                    Input.gyro.enabled = true;
+                    sendOrientation = true;
+                    StartCoroutine("OrientationProcessor");
+                }
+                else
+                {
+                    sendOrientation = false;
+                    StopCoroutine("OrientationProcessor");
+                    Input.gyro.enabled = false;
+                }
+
+                enableTouchSwipeData = data.enableTouchSwipeData;
+                if(enableTouchSwipeData)
+                {
+                    minSwipeDistY = Camera.main.pixelHeight / 4.5f;
+                    minSwipeDistX = Camera.main.pixelWidth / 5f;
+                    pixelCenter = Camera.main.pixelWidth / 2;
+                    startPos = Vector2.zero;
+                    skipCount = 0;
+                }
+            }
         }
 
-        if(Input.touchCount > 0)
+        if(Input.touchCount > 0 && enableTouchSwipeData)
         {
             Touch touch = Input.touches[0];
 
@@ -178,8 +201,6 @@ public class MVRController : MonoBehaviour {
 
     private void OnDisable()
     {
-        sendOrientation = false;
-        StopCoroutine("OrientationProcessor");
-        Input.gyro.enabled = false;
+        
     }
 }

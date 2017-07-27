@@ -91,4 +91,11 @@
         public int swipeDirection; // 0-left, 1-right, 2-up, 3-down
     }
 
+    [Serializable]
+    public class MVRConfigurationData
+    {
+        public bool enableOrientationData;
+        public bool enableTouchSwipeData;
+        public bool enableButtonData;
+    }
 }
