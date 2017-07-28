@@ -10,6 +10,7 @@ public class ShapesManager : MonoBehaviour
     public Text DebugText, ScoreText;
     public bool ShowDebugInfo = false;
     //candy graphics taken from http://opengameart.org/content/candy-pack-1
+    public GameObject reticle;
 
     public ShapesArray shapes;
 
@@ -269,7 +270,7 @@ public class ShapesManager : MonoBehaviour
 
             if (Physics.Raycast(ray, out hit, 200.0f))
             {
-                Debug.Log(hit.transform.name);
+                if (reticle.activeSelf) reticle.SetActive(false);
 
                 if (hitGo != null)
                 {
@@ -297,6 +298,7 @@ public class ShapesManager : MonoBehaviour
             }
             else
             {
+                if (!reticle.activeSelf) reticle.SetActive(true);
                 if (hitGo != null)
                 {
                     component = (Behaviour)hitGo.GetComponent("Halo");
