@@ -26,6 +26,9 @@ public class MVRInputManager : MonoBehaviour
     public bool enableTouchSwipe = false;
     public bool enableOrientation = false;
 
+    public RectTransform finger1;
+    public RectTransform finger2;
+
     void Awake()
     {
         if (instance == null)instance = this;
@@ -36,6 +39,7 @@ public class MVRInputManager : MonoBehaviour
     {
         connection = new MVRInputConnection(ConnectionType.APP);
         ipText.text = "IP: " + connection.ServerIP;
+
     }
 
     void InitController()
@@ -88,6 +92,31 @@ public class MVRInputManager : MonoBehaviour
                 MVRTouchSwipeData data = tmp as MVRTouchSwipeData;
                 if (OnTouchSwipe != null)
                     OnTouchSwipe((MVRSide)data.scrnSide, (MVRSide)data.swipeDirection);
+            }else if (tmp.GetType() == typeof(MVRTouchData))
+            {
+                MVRTouchData data = tmp as MVRTouchData;
+
+                if (!finger1.GetComponent<Image>().enabled) finger1.GetComponent<Image>().enabled = true;
+                finger1.GetComponent<RectTransform>().localPosition = new Vector3(
+                   ((data.x1 / 100) * screen.GetComponent<RectTransform>().rect.width) - screen.GetComponent<RectTransform>().rect.width/2,
+                   ((data.y1 / 100) * screen.GetComponent<RectTransform>().rect.height) - screen.GetComponent<RectTransform>().rect.height/2,
+                    0);
+
+                if(data.x1 == -1 && data.y1 == -1)
+                {
+                    finger1.GetComponent<Image>().enabled = false;
+                }
+
+                if (!finger2.GetComponent<Image>().enabled) finger2.GetComponent<Image>().enabled = true;
+                finger2.GetComponent<RectTransform>().localPosition = new Vector3(
+                   ((data.x2 / 100) * screen.GetComponent<RectTransform>().rect.width) - screen.GetComponent<RectTransform>().rect.width / 2,
+                   ((data.y2 / 100) * screen.GetComponent<RectTransform>().rect.height) - screen.GetComponent<RectTransform>().rect.height / 2,
+                    0);
+
+                if (data.x2 == -1 && data.y2 == -1)
+                {
+                    finger2.GetComponent<Image>().enabled = false;
+                }
             }
         }
     }
@@ -107,6 +136,7 @@ public class MVRInputManager : MonoBehaviour
         data.enableOrientationData = false;
         data.enableTouchSwipeData = false;
         data.enableButtonData = false;
+        data.enableTouchData = false;
         connection.SendToOther(connection.ObjectToByteArray(data));
     }
 
@@ -116,6 +146,7 @@ public class MVRInputManager : MonoBehaviour
         data.enableOrientationData = orientation;
         data.enableTouchSwipeData = touchswipe;
         data.enableButtonData = true;
+        data.enableTouchData = true;
         connection.SendToOther(connection.ObjectToByteArray(data));
     }
 }

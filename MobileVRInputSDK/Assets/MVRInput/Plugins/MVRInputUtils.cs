@@ -97,5 +97,13 @@
         public bool enableOrientationData;
         public bool enableTouchSwipeData;
         public bool enableButtonData;
+        public bool enableTouchData;
+    }
+
+    [Serializable]
+    public class MVRTouchData
+    {
+        public float x1, y1;
+        public float x2, y2;
     }
 }

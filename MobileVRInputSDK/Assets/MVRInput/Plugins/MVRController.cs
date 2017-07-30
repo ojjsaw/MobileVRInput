@@ -18,6 +18,8 @@ public class MVRController : MonoBehaviour {
     private bool sendOrientation = false;
     public string connectedIP = "NONE";
     private MVRTouchSwipeData swipeData = new MVRTouchSwipeData();
+    private MVRTouchData touchData = new MVRTouchData();
+
     private float minSwipeDistY;
     private Vector2 startPos;
     private float minSwipeDistX;
@@ -25,6 +27,8 @@ public class MVRController : MonoBehaviour {
     private int skipCount = 0;
     public bool enableButtonData = false;
     private bool enableTouchSwipeData = false;
+    private bool enableTouchData = false;
+    private int lastTouchCount = -1;
 
     void Awake () {
 
@@ -46,6 +50,7 @@ public class MVRController : MonoBehaviour {
         else
         {
             connectedIP = ipaddress;
+            lastTouchCount = -1;
         }
         return sts;
     }
@@ -119,6 +124,16 @@ public class MVRController : MonoBehaviour {
                     startPos = Vector2.zero;
                     skipCount = 0;
                 }
+
+                enableTouchData = data.enableTouchData;
+                if (data.enableTouchData)
+                {
+                    StartCoroutine("TouchProcessor");
+                }
+                else
+                {
+                    StopCoroutine("TouchProcessor");
+                }
             }
         }
 
@@ -176,6 +191,56 @@ public class MVRController : MonoBehaviour {
             }
         }
 
+    }
+
+    IEnumerator TouchProcessor()
+    {
+        while(enableTouchData)
+        {
+            int touchCount = Input.touchCount;
+
+            if (Input.touchCount != lastTouchCount)
+            {
+                if ((touchData.x1 != -1f && touchData.y1 != -1f) || (touchData.x2 != -1f && touchData.y2 != -1f))
+                {
+                    touchData.x1 = -1f;
+                    touchData.y1 = -1f;
+                    touchData.x2 = -1f;
+                    touchData.y2 = -1f;
+                    connection.SendToOther(connection.ObjectToByteArray(touchData));
+                }
+            }
+
+            if(touchCount > 0)
+            {
+                var tmpX = (Input.GetTouch(0).position.x * 100f) / Camera.main.pixelWidth;
+                var tmpY = (Input.GetTouch(0).position.y * 100f) / Camera.main.pixelHeight;
+                if (tmpX != touchData.x1 && tmpY != touchData.y1)
+                {
+                    touchData.x1 = tmpX;
+                    touchData.y1 = tmpY;
+                }
+
+                if (touchCount > 1)
+                {
+                    tmpX = (Input.GetTouch(1).position.x * 100f) / Camera.main.pixelWidth;
+                    tmpY = (Input.GetTouch(1).position.y * 100f) / Camera.main.pixelHeight;
+                    if (tmpX != touchData.x1 && tmpY != touchData.y1)
+                    {
+                        touchData.x2 = tmpX;
+                        touchData.y2 = tmpY;
+                    }
+                }
+
+                connection.SendToOther(connection.ObjectToByteArray(touchData));
+
+            }
+
+            lastTouchCount = touchCount;
+
+            yield return new WaitForSeconds(0.1f);
+           
+        }
     }
 
     IEnumerator OrientationProcessor()
