@@ -28,7 +28,7 @@ public class HomeController : MonoBehaviour, IPointerDownHandler
                 break;
             case Panels.PANEL3:
                 MVRInputManager.instance.DisableAllconfiguration();
-                SceneManager.LoadScene("CarRacing");
+                SceneManager.LoadScene("VirtualKeyboard");
                 break;
             default:
                 break;
