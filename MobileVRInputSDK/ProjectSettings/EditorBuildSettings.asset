@@ -11,15 +11,18 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/MVRInput/Scenes/MVRInputController.unity
     guid: 5bf21be68ee544040af0235829b4e1e4
-  - enabled: 1
+  - enabled: 0
     path: Assets/Samples/Scenes/Home.unity
     guid: 07dd679945bde434e902bf736b08eb8a
-  - enabled: 1
+  - enabled: 0
     path: Assets/Samples/Scenes/CarRacing.unity
     guid: 1662cd929a3fd284c91881c84c3a5548
-  - enabled: 1
+  - enabled: 0
     path: Assets/Samples/Scenes/Candy.unity
     guid: bfdc8879bc0cfd245867e8790941daff
-  - enabled: 1
+  - enabled: 0
     path: Assets/Samples/Scenes/VirtualKeyboard.unity
     guid: 596bcdb3626e4554386fbf27847aa38d
+  - enabled: 1
+    path: Assets/Samples/Scenes/VirtualJoystick.unity
+    guid: 2e9c1f57758cda345b705ea1d9f2a64d

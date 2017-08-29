@@ -6,7 +6,8 @@ using MVRInput;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-public class MVRController : MonoBehaviour {
+public class MVRController : MonoBehaviour
+{
 
     public static MVRController instance = null;
     private GameObject ButtonPrefab = null;
@@ -30,7 +31,8 @@ public class MVRController : MonoBehaviour {
     private bool enableTouchData = false;
     private int lastTouchCount = -1;
 
-    void Awake () {
+    void Awake()
+    {
 
         if (instance == null) instance = this;
         else if (instance != this) Destroy(gameObject);
@@ -68,6 +70,7 @@ public class MVRController : MonoBehaviour {
             enableButtonData = false;
             enableTouchSwipeData = false;
             sendOrientation = false;
+            pixelCenter = Camera.main.pixelWidth / 2;
 
             Debug.Log("deleting");
             UIElements.Clear();
@@ -75,7 +78,7 @@ public class MVRController : MonoBehaviour {
             connection.Close();
             connection = null;
         }
-    
+
         if (connection == null && connectedIP != "NONE")
         {
             Connect(connectedIP);
@@ -116,11 +119,10 @@ public class MVRController : MonoBehaviour {
                 }
 
                 enableTouchSwipeData = data.enableTouchSwipeData;
-                if(enableTouchSwipeData)
+                if (enableTouchSwipeData)
                 {
                     minSwipeDistY = Camera.main.pixelHeight / 4.5f;
                     minSwipeDistX = Camera.main.pixelWidth / 5f;
-                    pixelCenter = Camera.main.pixelWidth / 2;
                     startPos = Vector2.zero;
                     skipCount = 0;
                 }
@@ -137,7 +139,7 @@ public class MVRController : MonoBehaviour {
             }
         }
 
-        if(Input.touchCount > 0 && enableTouchSwipeData)
+        if (Input.touchCount > 0 && enableTouchSwipeData)
         {
             Touch touch = Input.touches[0];
 
@@ -159,7 +161,7 @@ public class MVRController : MonoBehaviour {
                         {
                             swipeData.swipeDirection = 2; //up
                             skipCount++;
-                            if(skipCount > 1) connection.SendToOther(connection.ObjectToByteArray(swipeData));
+                            if (skipCount > 1) connection.SendToOther(connection.ObjectToByteArray(swipeData));
                         }
                         else if (swipeValue < 0)
                         {
@@ -190,12 +192,11 @@ public class MVRController : MonoBehaviour {
                     break;
             }
         }
-
     }
 
     IEnumerator TouchProcessor()
     {
-        while(enableTouchData)
+        while (enableTouchData)
         {
             int touchCount = Input.touchCount;
 
@@ -211,7 +212,7 @@ public class MVRController : MonoBehaviour {
                 }
             }
 
-            if(touchCount > 0)
+            if (touchCount > 0)
             {
                 var tmpX = (Input.GetTouch(0).position.x * 100f) / Camera.main.pixelWidth;
                 var tmpY = (Input.GetTouch(0).position.y * 100f) / Camera.main.pixelHeight;
@@ -239,13 +240,13 @@ public class MVRController : MonoBehaviour {
             lastTouchCount = touchCount;
 
             yield return new WaitForSeconds(0.1f);
-           
+
         }
     }
 
     IEnumerator OrientationProcessor()
     {
-        while(sendOrientation)
+        while (sendOrientation)
         {
             var rotation = Input.gyro.attitude;
             orientationData.g_x = rotation.x;
@@ -266,6 +267,6 @@ public class MVRController : MonoBehaviour {
 
     private void OnDisable()
     {
-        
+
     }
 }

@@ -23,13 +23,3 @@ Platform assembly: C:\GitHub\MobileVRInput\Builds\RacingApp_Data\Managed\System.
 <RI> Initializing input.
 XInput1_3.dll not found. Trying XInput9_1_0.dll instead...
 <RI> Input initialized.
-<RI> Initialized touch support.
-UnloadTime: 0.608142 ms
-Setting up 4 worker threads for Enlighten.
-  Thread -> id: 1760 -> priority: 1 
-  Thread -> id: 4118 -> priority: 1 
-  Thread -> id: 34fc -> priority: 1 
-  Thread -> id: 50c -> priority: 1 
-Log: connection {1} has been disconnected by timeout; address {::ffff:10.0.0.206:53607} time {15556}, last rec time {13248} rtt {10} timeout {2000}
-host id {0} has been already deleted
-host id {0} out of bound or host has been already removed
