@@ -5,7 +5,7 @@ using UnityEngine;
 public class CharacterManager : MonoBehaviour {
 
     private float max = 60f;
-    private float factor = 1f;
+    private float factor = 0.5f;
 
 	// Use this for initialization
 	void Start () {

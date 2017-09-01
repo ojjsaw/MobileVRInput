@@ -9,7 +9,7 @@ public class HomeController : MonoBehaviour, IPointerDownHandler
 {
     public enum Panels
     {
-        PANEL1, PANEL2, PANEL3, NONE
+        PANEL1, PANEL2, PANEL3, PANEL4, NONE
     }
 
     private Panels currPanel = Panels.NONE;
@@ -30,6 +30,10 @@ public class HomeController : MonoBehaviour, IPointerDownHandler
                 MVRInputManager.instance.DisableAllconfiguration();
                 SceneManager.LoadScene("VirtualKeyboard");
                 break;
+            case Panels.PANEL4:
+                MVRInputManager.instance.DisableAllconfiguration();
+                SceneManager.LoadScene("VirtualJoystick");
+                break;
             default:
                 break;
         }
@@ -48,6 +52,11 @@ public class HomeController : MonoBehaviour, IPointerDownHandler
     public void Panel3()
     {
         currPanel = Panels.PANEL3;
+    }
+
+    public void Panel4()
+    {
+        currPanel = Panels.PANEL4;
     }
 
     public void PanelExit()
